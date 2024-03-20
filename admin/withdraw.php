@@ -1,10 +1,10 @@
 <?php
 require_once "../db/connection.php";
 if (isset ($_POST['submit'])) {
-  $user_id = $_POST['user_id'];
-  $status = $_POST['status'];
-  $qry = "UPDATE users SET status ='$status'  WHERE id = '$user_id'";
-  $res = mysqli_query($conn, $qry);
+    $user_id = $_POST['user_id'];
+    $status = $_POST['status'];
+    $qry = "UPDATE users SET status ='$status'  WHERE id = '$user_id'";
+    $res = mysqli_query($conn, $qry);
 }
 ?>
 <!DOCTYPE html>
@@ -46,7 +46,7 @@ if (isset ($_POST['submit'])) {
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="#">Home</a></li>
-                                <li class="breadcrumb-item active">User</li>
+                                <li class="breadcrumb-item active">Withdrawal</li>
                             </ol>
                         </div>
                     </div>
@@ -66,29 +66,31 @@ if (isset ($_POST['submit'])) {
                                     Name
                                 </th>
                                 <th style="width: 5%">
-                                    email
+                                    UPI Id
                                 </th>
                                 <th style="width: 20%">
-                                    mobile
+                                    Amount
                                 </th>
                                 <th style="width: 20%">
-                                    address
+                                    Message
                                 </th>
                                 <th style="width: 20%">
-                                    date
+                                    Payment status
                                 </th>
                                 <th style="width: 20%">
-                                    user status
+                                    Action
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
-              $i = 0;
-              $center = $conn->query("SELECT * FROM users");
-              while ($row = $center->fetch()) {
-                $i++;
-                ?>
+                            $i = 0;
+                            $center = $conn->query("SELECT withdrawals.*, users.first_name,  users.last_name
+                                                    FROM withdrawals 
+                                                    JOIN users ON withdrawals.user_id = users.id");
+                            while ($row = $center->fetch()) {
+                                $i++;
+                                ?>
                             <tr>
                                 <td>
                                     <?php echo $i; ?>
@@ -97,37 +99,37 @@ if (isset ($_POST['submit'])) {
                                     <?php echo $row['first_name'] . ' ' . $row['last_name']; ?>
                                 </td>
                                 <td>
-                                    <?php echo $row['email']; ?>
+                                    <?php echo $row['upi']; ?>
                                 </td>
                                 <td>
-                                    <?php echo $row['mobile']; ?>
+                                    <?php echo $row['amount']; ?>
                                 </td>
                                 <td>
-                                    <?php echo $row['address'] . ' ' . $row['city'] . ' ' . $row['state'] . ' ' . $row['country']; ?>
+                                    <?php echo $row['message']; ?>
                                 </td>
                                 <td>
-                                    <?php echo $row['created_at']; ?>
+                                    <?php
+                                        if ($row['status'] == 0) {
+                                            echo "Processing";
+                                        } elseif ($row['status'] == 1) {
+                                            echo "Succeeded";
+                                        } else {
+                                            echo "Rejected";
+                                        }
+                                        ?>
                                 </td>
                                 <td>
-                                    <form action="user.php" method="post">
-                                        <select name="status" class="form-control">
-                                            <option value="0" <?php if ($row['status'] == 0) {
-                          echo "selected";
-                        } ?>>Active
-                                            </option>
-                                            <option value="1" <?php if ($row['status'] == 1) {
-                          echo "selected";
-                        } ?>>
-                                                Deactive</option>
-                                        </select>
-                                        <input type="hidden" name="user_id" value="<?php echo $row['id']; ?>">
-                                        <input type="submit" class="btn btn-primary mt-2" name="submit" value="Update">
-                                    </form>
+                                    <a class="btn btn-info btn-sm"
+                                        href="edit-withdraw.php?id=<?php echo $row['id']; ?>">
+                                        <i class=" fas fa-pencil-alt">
+                                        </i>
+                                        Edit
+                                    </a>
                                 </td>
                             </tr>
                             <?php
-              }
-              ?>
+                            }
+                            ?>
 
                         </tbody>
                     </table>
